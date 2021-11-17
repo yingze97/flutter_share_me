@@ -49,6 +49,7 @@ public class FlutterShareMePlugin implements MethodCallHandler, FlutterPlugin, A
     final private static String _methodSystemShare = "system_share";
     final private static String _methodInstagramShare = "instagram_share";
     final private static String _methodTelegramShare = "telegram_share";
+    final private static String _methodCheckInstalledApps = "check_installed_apps";
 
 
     private Activity activity;
@@ -128,6 +129,9 @@ public class FlutterShareMePlugin implements MethodCallHandler, FlutterPlugin, A
             case _methodTelegramShare:
                 msg = call.argument("msg");
                 shareToTelegram(msg, result);
+                break;
+            case _methodCheckInstalledApps:
+                checkInstalledApps(result);
                 break;
             default:
                 result.notImplemented();
@@ -353,5 +357,20 @@ public class FlutterShareMePlugin implements MethodCallHandler, FlutterPlugin, A
             return false;
         }
 //        return false;
+    }
+
+    private void checkInstalledApps(Result result) {
+        try {
+            if (activity != null) {
+                activity.getPackageManager()
+                        .getApplicationInfo("com.instagram.android", 0);
+                result.success("true");
+            } else {
+                Log.d("App", "Instagram app is not installed on your device");
+                result.success("false");
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            result.error("error", e.toString(), "");
+        }
     }
 }

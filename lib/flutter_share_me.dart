@@ -16,6 +16,7 @@ class FlutterShareMe {
   static const String _methodInstagramShare = 'instagram_share';
   static const String _methodSystemShare = 'system_share';
   static const String _methodTelegramShare = 'telegram_share';
+  static const String _methodCheckInstalledApps = 'check_installed_apps';
 
   ///share to WhatsApp
   /// [imagePath] is local image
@@ -147,5 +148,11 @@ class FlutterShareMe {
       return e.toString();
     }
     return result;
+  }
+
+  ///check installed apps
+  static Future<Map?> checkInstalledAppsForShare() async {
+    final Map? apps = await _channel.invokeMethod(_methodCheckInstalledApps);
+    return apps;
   }
 }
