@@ -151,8 +151,15 @@ class FlutterShareMe {
   }
 
   ///check installed apps
-  static Future<Map?> checkInstalledAppsForShare() async {
-    final Map? apps = await _channel.invokeMethod(_methodCheckInstalledApps);
-    return apps;
+  Future<String?> checkInstalledAppsForShare() async {
+    final Map<String, dynamic> arguments = <String, dynamic>{};
+    String? result;
+
+    try {
+      result = await _channel.invokeMethod<String>(_methodCheckInstalledApps, arguments);
+    } catch (e) {
+      return e.toString();
+    }
+    return result;
   }
 }
