@@ -25,6 +25,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -49,7 +51,7 @@ public class FlutterShareMePlugin implements MethodCallHandler, FlutterPlugin, A
     final private static String _methodSystemShare = "system_share";
     final private static String _methodInstagramShare = "instagram_share";
     final private static String _methodTelegramShare = "telegram_share";
-    final private static String _methodCheckInstalledApps = "check_installed_apps";
+    final private static String _methodCheckIsAppInstalled = "check_is_app_installed";
 
 
     private Activity activity;
@@ -130,8 +132,17 @@ public class FlutterShareMePlugin implements MethodCallHandler, FlutterPlugin, A
                 msg = call.argument("msg");
                 shareToTelegram(msg, result);
                 break;
-            case _methodCheckInstalledApps:
-                checkInstalledApps(result);
+            case _methodCheckIsAppInstalled:
+                ArrayList<String> appNames = (ArrayList<String>) call.argument("apps");
+                
+                // ArrayList<String> list2 = new ArrayArrayList<String>();
+                // for(String text:appNames) {
+                //     list2.add(text);
+                // }
+
+                // ArrayList<String> appList = Arrays.asList(appNames);
+                // System.out.println("--------------------appList" + appList);
+                checkIsAppInstalled(appNames, result);
                 break;
             default:
                 result.notImplemented();
@@ -166,16 +177,16 @@ public class FlutterShareMePlugin implements MethodCallHandler, FlutterPlugin, A
      */
 
     private void shareToTwitter(String url, String msg, Result result) {
-        try {
-            TweetComposer.Builder builder = new TweetComposer.Builder(activity)
-                    .text(msg);
-            if (url != null && url.length() > 0) {
-                builder.url(new URL(url));
-            }
+        String urlScheme = "http://www.twitter.com/intent/tweet?text="+msg+" "+url;
+        Intent twitterIntent = new Intent(Intent.ACTION_VIEW);
+        twitterIntent.setType("text/plain");
+        twitterIntent.setData(Uri.parse(urlScheme));
 
-            builder.show();
+        try {
+            activity.startActivity(twitterIntent);
             result.success("success");
-        } catch (MalformedURLException e) {
+        } catch (Exception e) {
+            result.error("error", e.toString(), "");
             e.printStackTrace();
         }
     }
@@ -359,18 +370,50 @@ public class FlutterShareMePlugin implements MethodCallHandler, FlutterPlugin, A
 //        return false;
     }
 
-    private void checkInstalledApps(Result result) {
-        try {
-            if (activity != null) {
-                activity.getPackageManager()
-                        .getApplicationInfo("com.instagram.android", 0);
-                result.success("true");
-            } else {
-                Log.d("App", "Instagram app is not installed on your device");
-                result.success("false");
+    private void checkIsAppInstalled(ArrayList<String> appNames, Result result) {
+        String packageName = "";
+        ArrayList<String> installedApps = new ArrayList<String>();
+    
+        for (int i = 0; i < appNames.size(); i++) {
+            String name = appNames.get(i);
+
+            switch (name) {
+                case "facebook":
+                    packageName = "com.facebook.katana";
+                    break;
+                case "instagram":
+                    packageName = "com.instagram.android";
+                    break;
+                case "twitter":
+                    packageName = "com.twitter.android";
+                    break;
+                case "whatsapp":
+                    packageName = "com.whatsapp";
+                    break;
+                case "telegram":
+                    packageName = "com.telegram.messenger";
+                    break;
+                default:
+                    result.notImplemented();
+                    break;
             }
-        } catch (PackageManager.NameNotFoundException e) {
-            result.error("error", e.toString(), "");
+
+            try {
+                if (packageName != "" && activity != null) {
+                    activity.getPackageManager()
+                            .getApplicationInfo(packageName, 0);
+                    installedApps.add(name);
+                } else {
+                    Log.d("App", "App is not installed on your device");
+                }
+            } catch (PackageManager.NameNotFoundException e) {
+                result.error("error", e.toString(), "");
+            }
         }
+
+        // client to split the string
+        String returnedString = String.join(",", installedApps);
+
+        result.success(returnedString);
     }
 }

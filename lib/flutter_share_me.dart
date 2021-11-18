@@ -5,6 +5,8 @@ import 'file_type.dart';
 //export file type enum
 export 'package:flutter_share_me/file_type.dart';
 
+enum SocialShareChannel { facebook, twitter, whatsapp, instagram, system }
+
 class FlutterShareMe {
   final MethodChannel _channel = const MethodChannel('flutter_share_me');
 
@@ -16,7 +18,7 @@ class FlutterShareMe {
   static const String _methodInstagramShare = 'instagram_share';
   static const String _methodSystemShare = 'system_share';
   static const String _methodTelegramShare = 'telegram_share';
-  static const String _methodCheckInstalledApps = 'check_installed_apps';
+  static const String _methodCheckIsAppInstalled = 'check_is_app_installed';
 
   ///share to WhatsApp
   /// [imagePath] is local image
@@ -151,12 +153,14 @@ class FlutterShareMe {
   }
 
   ///check installed apps
-  Future<String?> checkInstalledAppsForShare() async {
+  Future<String?> getInstalledAppsForShare() async {
     final Map<String, dynamic> arguments = <String, dynamic>{};
+    List<String> apps = ['facebook','twitter'];
+    arguments.putIfAbsent('apps', () => apps);
     String? result;
 
     try {
-      result = await _channel.invokeMethod<String>(_methodCheckInstalledApps, arguments);
+      result = await _channel.invokeMethod<String>(_methodCheckIsAppInstalled, arguments);
     } catch (e) {
       return e.toString();
     }
