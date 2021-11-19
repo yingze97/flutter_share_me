@@ -51,6 +51,8 @@ public class FlutterShareMePlugin implements MethodCallHandler, FlutterPlugin, A
     final private static String _methodSystemShare = "system_share";
     final private static String _methodInstagramShare = "instagram_share";
     final private static String _methodTelegramShare = "telegram_share";
+    final private static String _methodWechatShare = "wechat_share";
+    final private static String _methodMessengerShare = "messenger_share";
     final private static String _methodCheckIsAppInstalled = "check_is_app_installed";
 
 
@@ -132,16 +134,17 @@ public class FlutterShareMePlugin implements MethodCallHandler, FlutterPlugin, A
                 msg = call.argument("msg");
                 shareToTelegram(msg, result);
                 break;
+            case _methodWechatShare:
+                msg = call.argument("msg");
+                shareToWechat(msg, result);
+                break;
+            case _methodMessengerShare:
+                url = call.argument("url");
+                msg = call.argument("msg");
+                shareToMessenger(msg, result);
+                break;
             case _methodCheckIsAppInstalled:
                 ArrayList<String> appNames = (ArrayList<String>) call.argument("apps");
-                
-                // ArrayList<String> list2 = new ArrayArrayList<String>();
-                // for(String text:appNames) {
-                //     list2.add(text);
-                // }
-
-                // ArrayList<String> appList = Arrays.asList(appNames);
-                // System.out.println("--------------------appList" + appList);
                 checkIsAppInstalled(appNames, result);
                 break;
             default:
@@ -370,6 +373,55 @@ public class FlutterShareMePlugin implements MethodCallHandler, FlutterPlugin, A
 //        return false;
     }
 
+    /**
+     * share to wechat
+     *
+     * @param msg                String
+     * @param result             Result
+     */
+    
+    private void shareToWechat(String msg, Result result) {
+        try {
+            Intent wechatIntent = new Intent(Intent.ACTION_SEND);
+            wechatIntent.setType("text/plain");
+            wechatIntent.setPackage("com.tencent.mm");
+            wechatIntent.putExtra(Intent.EXTRA_TEXT, msg);
+            try {
+                activity.startActivity(wechatIntent);
+                result.success("true");
+            } catch (Exception ex) {
+                result.success("false:Wechat app is not installed on your device");
+            }
+        } catch (Exception var9) {
+            result.error("error", var9.toString(), "");
+        }
+    }
+
+    /**
+     * share to messenger
+     *
+     * @param msg                String
+     * @param result             Result
+     */
+    
+    private void shareToMessenger(String msg, Result result) {
+        try {
+            Intent messengerIntent = new Intent();
+            messengerIntent.setAction(Intent.ACTION_SEND);
+            messengerIntent.setType("text/plain");
+            messengerIntent.setPackage("com.facebook.orca");
+            messengerIntent.putExtra(Intent.EXTRA_TEXT, msg);
+            try {
+                activity.startActivity(messengerIntent);
+                result.success("true");
+            } catch (Exception ex) {
+                result.success("false:Messenger app is not installed on your device");
+            }
+        } catch (Exception var9) {
+            result.error("error", var9.toString(), "");
+        }
+    }
+
     private void checkIsAppInstalled(ArrayList<String> appNames, Result result) {
         String packageName = "";
         ArrayList<String> installedApps = new ArrayList<String>();
@@ -380,6 +432,9 @@ public class FlutterShareMePlugin implements MethodCallHandler, FlutterPlugin, A
             switch (name) {
                 case "facebook":
                     packageName = "com.facebook.katana";
+                    break;
+                case "messenger":
+                    packageName = "com.facebook.orca";
                     break;
                 case "instagram":
                     packageName = "com.instagram.android";
@@ -393,6 +448,9 @@ public class FlutterShareMePlugin implements MethodCallHandler, FlutterPlugin, A
                 case "telegram":
                     packageName = "com.telegram.messenger";
                     break;
+                case "wechat":
+                    packageName = "com.tencent.mm";
+                    break;
                 default:
                     result.notImplemented();
                     break;
@@ -404,10 +462,10 @@ public class FlutterShareMePlugin implements MethodCallHandler, FlutterPlugin, A
                             .getApplicationInfo(packageName, 0);
                     installedApps.add(name);
                 } else {
-                    Log.d("App", "App is not installed on your device");
+                    Log.i("App", packageName + "App is not installed on your device");
                 }
             } catch (PackageManager.NameNotFoundException e) {
-                result.error("error", e.toString(), "");
+                // do nothing
             }
         }
 

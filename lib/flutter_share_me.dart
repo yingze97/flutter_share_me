@@ -18,6 +18,8 @@ class FlutterShareMe {
   static const String _methodInstagramShare = 'instagram_share';
   static const String _methodSystemShare = 'system_share';
   static const String _methodTelegramShare = 'telegram_share';
+  static const String _methodWechatShare = 'wechat_share';
+  static const String _methodMessengerShare = 'messenger_share';
   static const String _methodCheckIsAppInstalled = 'check_is_app_installed';
 
   ///share to WhatsApp
@@ -152,10 +154,38 @@ class FlutterShareMe {
     return result;
   }
 
+  ///share to wechat
+  Future<String?> shareToWechat({required String msg, String url = ''}) async {
+    final Map<String, dynamic> arguments = <String, dynamic>{};
+    arguments.putIfAbsent('msg', () => msg);
+    arguments.putIfAbsent('url', () => url);
+    String? result;
+    try {
+      result = await _channel.invokeMethod<String?>(_methodWechatShare, arguments);
+    } catch (e) {
+      return e.toString();
+    }
+    return result;
+  }
+
+  ///share to messenger
+  Future<String?> shareToMessenger({required String msg, String url = ''}) async {
+    final Map<String, dynamic> arguments = <String, dynamic>{};
+    arguments.putIfAbsent('msg', () => msg);
+    arguments.putIfAbsent('url', () => url);
+    String? result;
+    try {
+      result = await _channel.invokeMethod<String?>(_methodMessengerShare, arguments);
+    } catch (e) {
+      return e.toString();
+    }
+    return result;
+  }
+
   ///check installed apps
   Future<String?> getInstalledAppsForShare() async {
     final Map<String, dynamic> arguments = <String, dynamic>{};
-    List<String> apps = ['facebook','twitter'];
+    List<String> apps = ['facebook','messenger','telegram','twitter','wechat','whatsapp'];
     arguments.putIfAbsent('apps', () => apps);
     String? result;
 
