@@ -13,6 +13,8 @@ public class SwiftFlutterShareMePlugin: NSObject, FlutterPlugin, SharingDelegate
     let _methodInstagram = "instagram_share";
     let _methodSystemShare = "system_share";
     let _methodTelegramShare = "telegram_share";
+    let _methodMessengerShare = "messenger_share";
+    let _methodViberShare = "viber_share";
     
     var result: FlutterResult?
     var documentInteractionController: UIDocumentInteractionController?
@@ -73,6 +75,14 @@ public class SwiftFlutterShareMePlugin: NSObject, FlutterPlugin, SharingDelegate
         else if(call.method.elementsEqual(_methodTelegramShare)){
             let args = call.arguments as? Dictionary<String,Any>
             shareToTelegram(message: args!["msg"] as! String, result: result )
+        }
+        else if(call.method.elementsEqual(_methodMessengerShare)){
+            let args = call.arguments as? Dictionary<String,Any>
+            shareMessenger(message: args!, result: result )
+        }
+        else if(call.method.elementsEqual(_methodViberShare)){
+            let args = call.arguments as? Dictionary<String,Any>
+            shareViber(message: args!["msg"] as! String, result: result )
         }
         else{
             let args = call.arguments as? Dictionary<String,Any>
@@ -240,6 +250,43 @@ public class SwiftFlutterShareMePlugin: NSObject, FlutterPlugin, SharingDelegate
         }
     
     }
+
+    // share messenger
+    // params
+    // @ map conting meesage and url
+    
+    func shareMessenger(message:Dictionary<String,Any>, result: @escaping FlutterResult)  {
+        let shareContent = ShareLinkContent()
+        shareContent.contentURL = URL.init(string: message["url"] as! String)!
+        shareContent.quote = message["msg"] as? String
+
+        let shareDialog = MessageDialog(content: shareContent, delegate: self)
+        shareDialog.show()
+        result("Sucess")
+    }
+
+    // share viber
+    // params
+    // @ map conting meesage and url
+    
+    func shareViber(message: String,result: @escaping FlutterResult )
+    {
+        let viber = "viber://forward?text=\(message)"
+        var characterSet = CharacterSet.urlQueryAllowed
+        characterSet.insert(charactersIn: "?&")
+        let viberURL  = NSURL(string: viber.addingPercentEncoding(withAllowedCharacters: characterSet)!)
+        if UIApplication.shared.canOpenURL(viberURL! as URL)
+        {
+            result("Sucess");
+            UIApplication.shared.openURL(viberURL! as URL)
+        }
+        else
+        {
+            result(FlutterError(code: "Not found", message: "viber is not found", details: "viber not intalled or Check url scheme."));
+        }
+    
+    }
+
 
     //share via system native dialog
     //@ text that you want to share.
