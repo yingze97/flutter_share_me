@@ -20,6 +20,7 @@ class FlutterShareMe {
   static const String _methodTelegramShare = 'telegram_share';
   static const String _methodWechatShare = 'wechat_share';
   static const String _methodMessengerShare = 'messenger_share';
+  static const String _methodViberShare = 'viber_share';
   static const String _methodCheckIsAppInstalled = 'check_is_app_installed';
 
   ///share to WhatsApp

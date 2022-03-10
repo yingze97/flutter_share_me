@@ -53,6 +53,7 @@ public class FlutterShareMePlugin implements MethodCallHandler, FlutterPlugin, A
     final private static String _methodTelegramShare = "telegram_share";
     final private static String _methodWechatShare = "wechat_share";
     final private static String _methodMessengerShare = "messenger_share";
+    final private static String _methodViberShare = "viber_share";
     final private static String _methodCheckIsAppInstalled = "check_is_app_installed";
 
 
@@ -142,6 +143,10 @@ public class FlutterShareMePlugin implements MethodCallHandler, FlutterPlugin, A
                 url = call.argument("url");
                 msg = call.argument("msg");
                 shareToMessenger(msg, result);
+                break;
+            case _methodViberShare:
+                msg = call.argument("msg");
+                shareToViber(msg, result);
                 break;
             case _methodCheckIsAppInstalled:
                 ArrayList<String> appNames = (ArrayList<String>) call.argument("apps");
@@ -419,6 +424,28 @@ public class FlutterShareMePlugin implements MethodCallHandler, FlutterPlugin, A
             }
         } catch (Exception var9) {
             result.error("error", var9.toString(), "");
+        }
+    }
+
+    /**
+     * share to viber
+     *
+     * @param msg                String
+     * @param result             Result
+     */
+    
+    private void shareToViber(String msg, Result result) {
+        String urlScheme = "viber://forward?text="+msg;
+        Intent viberIntent = new Intent(Intent.ACTION_VIEW);
+        viberIntent.setType("text/plain");
+        viberIntent.setData(Uri.parse(urlScheme));
+
+        try {
+            activity.startActivity(viberIntent);
+            result.success("success");
+        } catch (Exception e) {
+            result.error("error", e.toString(), "");
+            e.printStackTrace();
         }
     }
 
