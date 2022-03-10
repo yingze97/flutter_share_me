@@ -182,6 +182,20 @@ class FlutterShareMe {
     return result;
   }
 
+  ///share to viber
+  /// [msg] message text you want on viber
+  Future<String?> shareToViber({required String msg}) async {
+    final Map<String, dynamic> arguments = <String, dynamic>{};
+    arguments.putIfAbsent('msg', () => msg);
+    String? result;
+    try {
+      result = await _channel.invokeMethod<String>(_methodViberShare, arguments);
+    } catch (e) {
+      return e.toString();
+    }
+    return result;
+  }
+
   ///check installed apps
   Future<String?> getInstalledAppsForShare() async {
     final Map<String, dynamic> arguments = <String, dynamic>{};
