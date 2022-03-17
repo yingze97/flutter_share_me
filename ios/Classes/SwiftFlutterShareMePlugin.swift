@@ -74,7 +74,7 @@ public class SwiftFlutterShareMePlugin: NSObject, FlutterPlugin, SharingDelegate
         }
         else if(call.method.elementsEqual(_methodTelegramShare)){
             let args = call.arguments as? Dictionary<String,Any>
-            shareToTelegram(message: args!["msg"] as! String, result: result )
+            shareToTelegram(message: args!["msg"] as! String, url: args!["url"] as! String, result: result )
         }
         else if(call.method.elementsEqual(_methodMessengerShare)){
             let args = call.arguments as? Dictionary<String,Any>
@@ -233,9 +233,9 @@ public class SwiftFlutterShareMePlugin: NSObject, FlutterPlugin, SharingDelegate
     }
     //share via telegram
     //@ text that you want to share.
-    func shareToTelegram(message: String,result: @escaping FlutterResult )
+    func shareToTelegram(message: String, url:String, result: @escaping FlutterResult )
     {
-        let telegram = "tg://msg?text=\(message)"
+        let telegram = "tg://msg_url?url=\(url)&text=\(message)"
         var characterSet = CharacterSet.urlQueryAllowed
         characterSet.insert(charactersIn: "?&")
         let telegramURL  = NSURL(string: telegram.addingPercentEncoding(withAllowedCharacters: characterSet)!)

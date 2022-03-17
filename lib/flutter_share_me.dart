@@ -70,9 +70,10 @@ class FlutterShareMe {
   ///share to Telegram
   /// [msg] message text you want on telegram
   Future<String?> shareToTelegram(
-      {required String msg}) async {
+      {required String msg, String url = ''}) async {
     final Map<String, dynamic> arguments = <String, dynamic>{};
     arguments.putIfAbsent('msg', () => msg);
+    arguments.putIfAbsent('url', () => url);
     String? result;
     try {
       result = await _channel.invokeMethod<String>(_methodTelegramShare, arguments);
