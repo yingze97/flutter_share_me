@@ -473,7 +473,7 @@ public class FlutterShareMePlugin implements MethodCallHandler, FlutterPlugin, A
                     packageName = "com.whatsapp";
                     break;
                 case "telegram":
-                    packageName = "com.telegram.messenger";
+                    packageName = "org.telegram.messenger";
                     break;
                 case "wechat":
                     packageName = "com.tencent.mm";
