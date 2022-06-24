@@ -201,7 +201,6 @@ class FlutterShareMe {
   ///check installed apps
   Future<String?> getInstalledAppsForShare({ List<String>? apps = const ['facebook','messenger','telegram','twitter','wechat','whatsapp'] }) async {
     final Map<String, dynamic> arguments = <String, dynamic>{};
-    List<String> apps = apps;
     arguments.putIfAbsent('apps', () => apps);
     String? result;
 
