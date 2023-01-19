@@ -15,6 +15,7 @@ public class SwiftFlutterShareMePlugin: NSObject, FlutterPlugin, SharingDelegate
     let _methodTelegramShare = "telegram_share";
     let _methodMessengerShare = "messenger_share";
     let _methodViberShare = "viber_share";
+    let _methodCheckIsAppInstalled = "check_is_app_installed";
     
     var result: FlutterResult?
     var documentInteractionController: UIDocumentInteractionController?
@@ -83,6 +84,10 @@ public class SwiftFlutterShareMePlugin: NSObject, FlutterPlugin, SharingDelegate
         else if(call.method.elementsEqual(_methodViberShare)){
             let args = call.arguments as? Dictionary<String,Any>
             shareViber(message: args!["msg"] as! String, result: result )
+        }
+        else if(call.method.elementsEqual(_methodCheckIsAppInstalled)){
+            let args = call.arguments as? Dictionary<String,Any>
+            checkIfAppInstalled(args: args!["apps"] as! [String], result: result)
         }
         else{
             let args = call.arguments as? Dictionary<String,Any>
@@ -214,7 +219,12 @@ public class SwiftFlutterShareMePlugin: NSObject, FlutterPlugin, SharingDelegate
         let urlTextEscaped = urlstring.addingPercentEncoding(withAllowedCharacters: .urlFragmentAllowed)
         let url = URL(string: urlTextEscaped ?? "")
         
-        let urlWithLink = twitterUrl + url!.absoluteString
+        var urlWithLink:String
+        if(url != nil){
+            urlWithLink = twitterUrl + url!.absoluteString
+        } else {
+            urlWithLink = twitterUrl
+        }
         
         let escapedShareString = urlWithLink.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!
         // cast to an url
@@ -357,6 +367,40 @@ public class SwiftFlutterShareMePlugin: NSObject, FlutterPlugin, SharingDelegate
         } catch {
             print("Fail")
         }
+    }
+    
+    func checkIfAppInstalled(args:[String],result: @escaping FlutterResult){
+        var installedApps = [String]()
+        var packageName = ""
+
+        for apps in args {
+            switch apps{
+            case "facebook":
+                packageName = "fb://"
+            case "messenger":
+                packageName = "fb-messenger-api://"
+            case "instagram":
+                packageName = "instagram://"
+            case "twitter":
+                packageName = "twitter://"
+            case "whatsapp":
+                packageName = "whatsapp://"
+            case "telegram":
+                packageName = "tg://"
+            default:
+                packageName = ""
+            }
+
+            if(packageName != ""){
+                let appUrl = URL(string: packageName)
+                if UIApplication.shared.canOpenURL(appUrl! as URL) {
+                    installedApps.append(apps)
+                }
+            }
+        }
+        let stringRepresentation = installedApps.joined(separator: ",")
+        result(stringRepresentation)
+        
     }
     
     //Facebook delegate methods
