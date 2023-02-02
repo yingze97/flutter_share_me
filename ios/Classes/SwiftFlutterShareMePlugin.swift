@@ -203,7 +203,7 @@ public class SwiftFlutterShareMePlugin: NSObject, FlutterPlugin, SharingDelegate
         let viewController = UIApplication.shared.delegate?.window??.rootViewController
         
         let shareContent = ShareLinkContent()
-        shareContent.contentURL = URL.init(string: message["url"] as! String)!
+//         shareContent.contentURL = URL.init(string: message["url"] as! String)!
         shareContent.quote = message["msg"] as? String
         ShareDialog(viewController: viewController, content: shareContent, delegate: self).show()
         result("Sucess")
@@ -245,7 +245,7 @@ public class SwiftFlutterShareMePlugin: NSObject, FlutterPlugin, SharingDelegate
     //@ text that you want to share.
     func shareToTelegram(message: String, url:String, result: @escaping FlutterResult )
     {
-        let telegram = "tg://msg_url?url=\(url)&text=\(message)"
+        let telegram = "https://t.me/share/url?url=\(url)&text=\(message)"
         var characterSet = CharacterSet.urlQueryAllowed
         characterSet.insert(charactersIn: "?&")
         let telegramURL  = NSURL(string: telegram.addingPercentEncoding(withAllowedCharacters: characterSet)!)
