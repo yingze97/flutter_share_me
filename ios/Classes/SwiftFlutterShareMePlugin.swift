@@ -105,9 +105,9 @@ public class SwiftFlutterShareMePlugin: NSObject, FlutterPlugin, SharingDelegate
         }else{
             whatsURL = "whatsapp://app"
         }
-        
-        var characterSet = CharacterSet.urlQueryAllowed
-        characterSet.insert(charactersIn: "?&")
+    
+        //custom character because .urlQueryAllowed doesn't work for some reason
+        var characterSet = CharacterSet(charactersIn: "!*'();@&+$,%#[] ").inverted
         let whatsAppURL  = NSURL(string: whatsURL.addingPercentEncoding(withAllowedCharacters: characterSet)!)
         if UIApplication.shared.canOpenURL(whatsAppURL! as URL)
         {
@@ -249,9 +249,9 @@ public class SwiftFlutterShareMePlugin: NSObject, FlutterPlugin, SharingDelegate
     //@ text that you want to share.
     func shareToTelegram(message: String, url:String, result: @escaping FlutterResult )
     {
-        let telegram = "https://t.me/share/url?url=\(url)&text=\(message)"
-        var characterSet = CharacterSet.urlQueryAllowed
-        characterSet.insert(charactersIn: "?&")
+        let telegram = "tg://msg?text=\(message)"
+        //custom character because .urlQueryAllowed doesn't work for some reason for "&" character
+        var characterSet = CharacterSet(charactersIn: "!*'();@&+$,%#[] ").inverted
         let telegramURL  = NSURL(string: telegram.addingPercentEncoding(withAllowedCharacters: characterSet)!)
         if UIApplication.shared.canOpenURL(telegramURL! as URL)
         {
