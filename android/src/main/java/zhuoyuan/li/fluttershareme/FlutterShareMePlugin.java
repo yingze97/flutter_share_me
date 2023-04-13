@@ -185,7 +185,13 @@ public class FlutterShareMePlugin implements MethodCallHandler, FlutterPlugin, A
      */
 
     private void shareToTwitter(String url, String msg, Result result) {
-        String urlScheme = "http://www.twitter.com/intent/tweet?text="+msg+" "+url;
+        String urlScheme = null;
+        try {
+            urlScheme = "http://www.twitter.com/intent/tweet?text="+URLEncoder.encode(msg, "UTF-8")+" "+url;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+//        String urlScheme = "http://www.twitter.com/intent/tweet?text="+msg+" "+url;
         Intent twitterIntent = new Intent(Intent.ACTION_VIEW);
         twitterIntent.setType("text/plain");
         twitterIntent.setData(Uri.parse(urlScheme));
